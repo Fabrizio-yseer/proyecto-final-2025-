@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "nombre": "Zapatillas Urbanas Clásicas",
+    "precio": 139,
+    "imagen": "imagenes/zapatillas.webp"
+  },
+  {
+    "id": 2,
+    "nombre": "Camisa de Lino Beige",
+    "precio": 89,
+    "imagen": "imagenes/CamisetaLino.webp"
+  },
+  {
+    "id": 3,
+    "nombre": "Mochila Antirrobo Negra",
+    "precio": 159,
+    "imagen": "imagenes/MochilaAntirrobo.webp"
+  },
+  {
+    "id": 4,
+    "nombre": "Gafas de Sol Polarizadas",
+    "precio": 109,
+    "imagen": "imagenes/Lentesdesolpolarizadas.webp"
+  }
+]
