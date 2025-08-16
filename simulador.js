@@ -1,38 +1,24 @@
 // simulador.js
 
 document.addEventListener("DOMContentLoaded", () => {
-  const productos = [
-    {
-      id: 1,
-      nombre: "Zapatillas Urbanas Clásicas",
-      precio: 139,
-      imagen: "imagenes/zapatillas.webp"
-    },
-    {
-      id: 2,
-      nombre: "Camisa de Lino Beige",
-      precio: 89,
-      imagen: "imagenes/CamisetaLino.webp"
-    },
-    {
-      id: 3,
-      nombre: "Mochila Antirrobo Negra",
-      precio: 159,
-      imagen: "imagenes/MochilaAntirrobo.webp"
-    },
-    {
-      id: 4,
-      nombre: "Gafas de Sol Polarizadas",
-      precio: 109,
-      imagen: "imagenes/Lentesdesolpolarizadas.webp"
-    }
-  ];
+  let productos = [];
+  let carrito = [];
 
   const contenedor = document.getElementById("productos-container");
   const btnCarrito = document.getElementById("ver-carrito");
   const spanCantidad = document.getElementById("cantidad-carrito");
-  let carrito = [];
 
+  // 🔹 Guardar y cargar carrito desde localStorage
+  function guardarCarrito() {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+  }
+
+  function cargarCarrito() {
+    carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    actualizarCantidad();
+  }
+
+  // 🔹 Renderizar productos en pantalla
   function renderizarProductos() {
     contenedor.innerHTML = "";
     productos.forEach(producto => {
@@ -48,15 +34,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 🔹 Actualizar contador del carrito
   function actualizarCantidad() {
     spanCantidad.textContent = carrito.length;
   }
 
+  // 🔹 Agregar producto al carrito
   function agregarAlCarrito(id) {
     const prod = productos.find(p => p.id === parseInt(id));
     if (prod) {
       carrito.push(prod);
       actualizarCantidad();
+      guardarCarrito();
       Swal.fire({
         icon: 'success',
         title: 'Producto agregado',
@@ -67,6 +56,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // 🔹 Eliminar producto del carrito
+  function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    actualizarCantidad();
+    guardarCarrito();
+    verCarrito(); // refrescar vista
+  }
+
+  // 🔹 Mostrar carrito
   function verCarrito() {
     if (carrito.length === 0) {
       Swal.fire('Carrito vacío', 'Agrega productos para verlos aquí.', 'info');
@@ -75,10 +73,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let html = '<ul style="text-align:left">';
     let total = 0;
-    carrito.forEach(item => {
-      html += `<li>${item.nombre} - S/ ${item.precio}</li>`;
+
+    carrito.forEach((item, index) => {
+      html += `
+        <li>
+          ${item.nombre} - S/ ${item.precio} 
+          <button onclick="eliminarDelCarrito(${index})">❌</button>
+        </li>`;
       total += item.precio;
     });
+
     html += `</ul><br><strong>Total: S/ ${total}</strong>`;
 
     Swal.fire({
@@ -88,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 🔹 Escuchadores
   contenedor.addEventListener("click", e => {
     if (e.target.tagName === "BUTTON") {
       agregarAlCarrito(e.target.dataset.id);
@@ -95,5 +100,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   btnCarrito.addEventListener("click", verCarrito);
-  renderizarProductos();
+
+  // 🔹 Hacer fetch a productos.json
+  fetch("productos.json")
+    .then(res => res.json())
+    .then(data => {
+      productos = data;
+      renderizarProductos();
+    });
+
+  // Hacer accesible la función de eliminar al modal
+  window.eliminarDelCarrito = eliminarDelCarrito;
+
+  // Cargar carrito guardado al inicio
+  cargarCarrito();
 });
